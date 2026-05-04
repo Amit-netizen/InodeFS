@@ -1,0 +1,22 @@
+# Build artifacts
+build/
+*.o
+
+# Compiled binaries
+litefs
+litefs-fsck
+litefs_test
+
+# Temporary files
+*.tmp
+*.log
+*.swp
+.DS_Store
+
+# Runtime filesystem images
+*.disk
+*.journal
+
+# Mount directories
+mnt/
+tmp/
