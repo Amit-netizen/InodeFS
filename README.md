@@ -1,7 +1,7 @@
-# LiteFS — User-Space Filesystem with Journaling & LRU Cache
+# InodFS — User-Space Filesystem with Journaling & LRU Cache
 
 A production-quality filesystem built from scratch in C using FUSE (Filesystem in Userspace).  
-LiteFS implements core OS storage concepts — inode management, block allocation, write-ahead  
+InodFS implements core OS storage concepts — inode management, block allocation, write-ahead  
 logging, and an LRU block cache — entirely in user space, mountable on any Linux system.
 
 ---
@@ -72,8 +72,8 @@ sudo apt install gcc make libfuse3-dev fuse3 pkg-config
 ### Build
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/litefs.git
-cd litefs
+git clone https://github.com/YOUR_USERNAME/inodfs.git
+cd inodfs
 make all
 ```
 
@@ -83,9 +83,9 @@ make all
 
 Produces three binaries:
 
-- `./litefs` — FUSE filesystem daemon
-- `./litefs-fsck` — offline consistency checker
-- `./litefs_test` — unit + integration test runner
+- `./inodfs` — FUSE filesystem daemon
+- `./inodfs-fsck` — offline consistency checker
+- `./inodfs_test` — unit + integration test runner
 
 ---
 
@@ -108,7 +108,7 @@ Tests run entirely without FUSE — safe for CI environments.
 
 ```bash
 # Create a 16MB filesystem
-./litefs mkfs /tmp/lfs.disk /tmp/lfs.journal 4096
+./inodfs mkfs /tmp/lfs.disk /tmp/lfs.journal 4096
 ```
 
 ![Create Filesystem](screenshots/LFS-5.png)
@@ -116,7 +116,7 @@ Tests run entirely without FUSE — safe for CI environments.
 ```bash
 # Mount (Terminal 1 — keep running)
 mkdir -p /tmp/mnt
-./litefs mount /tmp/lfs.disk /tmp/lfs.journal /tmp/mnt -f
+./inodfs mount /tmp/lfs.disk /tmp/lfs.journal /tmp/mnt -f
 ```
 
 ![Mount Filesystem](screenshots/LFS-6.png)
@@ -127,7 +127,7 @@ mkdir -p /tmp/mnt
 
 ```bash
 # Terminal 2
-echo "Hello LiteFS" > /tmp/mnt/hello.txt
+echo "Hello inodfs" > /tmp/mnt/hello.txt
 
 cat /tmp/mnt/hello.txt
 
@@ -153,12 +153,12 @@ fusermount3 -u /tmp/mnt
 echo "must survive" > /tmp/mnt/critical.txt
 
 # Simulate sudden power loss
-kill -9 $(pgrep litefs)
+kill -9 $(pgrep inodfs)
 
 fusermount3 -u /tmp/mnt 2>/dev/null || true
 
 # Remount — journal replay triggers automatically
-./litefs mount /tmp/lfs.disk /tmp/lfs.journal /tmp/mnt -f
+./inodfs mount /tmp/lfs.disk /tmp/lfs.journal /tmp/mnt -f
 
 # [mount] filesystem was not cleanly unmounted, replaying journal...
 # [journal] replayed block 32 (seq=1)
@@ -174,9 +174,9 @@ cat /tmp/mnt/critical.txt
 ```bash
 fusermount3 -u /tmp/mnt
 
-./litefs-fsck /tmp/lfs.disk /tmp/lfs.journal
+./inodfs-fsck /tmp/lfs.disk /tmp/lfs.journal
 
-./litefs-fsck /tmp/lfs.disk /tmp/lfs.journal --fix
+./inodfs-fsck /tmp/lfs.disk /tmp/lfs.journal --fix
 ```
 
 ---
@@ -184,9 +184,9 @@ fusermount3 -u /tmp/mnt
 ## Project Structure
 
 ```text
-litefs/
+inodfs/
 ├── include/
-│   └── litefs.h          # All types, constants, API declarations
+│   └── inodfs.h          # All types, constants, API declarations
 ├── src/
 │   ├── main.c            # Entry point: mkfs + mount modes
 │   ├── fs.c              # Mount/unmount, superblock I/O
@@ -202,7 +202,7 @@ litefs/
 │   ├── fsck.c            # 5-pass consistency checker
 │   └── fsck_main.c       # fsck entry point
 ├── tests/
-│   └── test_litefs.c     # 67 unit + integration tests
+│   └── test_inodfs.c     # 67 unit + integration tests
 ├── scripts/
 │   └── stress_test.sh    # Crash simulation + concurrent write tests
 ├── screenshots/
